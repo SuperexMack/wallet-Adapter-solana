@@ -1,5 +1,6 @@
 import { useConnection , useWallet } from "@solana/wallet-adapter-react"
 import { useEffect, useState , useCallback} from "react"
+import { SystemProgram, Transaction } from '@solana/web3.js';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,6 +10,7 @@ export function AirDrop(){
   
    const [getValue , setValue] = useState(0)
    const [balance,setBalance] = useState(0)
+   const [transferSol , setTransferSol] = useState(0)
    let wallet = useWallet()
    let {connection} = useConnection()
 
@@ -38,6 +40,46 @@ export function AirDrop(){
    }
 
 
+   const TransFerSolToOther = useCallback(async()=>{
+
+
+    try{
+        const lamports = await connection.getMinimumBalanceForRentExemption(0);
+
+        const transaction = new Transaction().add(
+            SystemProgram.transfer({
+                fromPubkey: wallet.publicKey,
+                toPubkey: transferSol,
+                lamports,
+            })
+        );
+    
+        const {
+            context: { slot: minContextSlot },
+            value: { blockhash, lastValidBlockHeight }
+        } = await connection.getLatestBlockhashAndContext();
+    
+    
+        
+    
+        const signature = await wallet.sendTransaction(transaction, connection, { minContextSlot });
+    
+        await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
+
+        toast.success("Sended Money to your Friend ")
+    
+    
+    }
+
+    catch(error){
+        console.log("Some error occured :" + error)
+        toast.error("some error" + error)
+    }
+    
+
+   },[wallet.publicKey,connection,wallet.sendTransaction])
+
+
     return(
         <>
 
@@ -49,6 +91,18 @@ export function AirDrop(){
         <button onClick={sendDrop} className="bg-black p-4 text-white w-[200px] rounded-lg font-bold">Send AirDrop</button>
         </div>
         </div>
+
+        <hr></hr>
+       
+        <div className="h-[500px] w-auto relative top-[100px] flex flex-col space-y-9">
+            <h1 className="text-center text-[60px] font-bold">Transfer Sol</h1>
+            <div className="flex justify-center space-x-9">
+            <input onChange={(e)=>setTransferSol(e.target.value)} placeholder="Enter public key" className="w-[500px] border-black rounded-lg p-3 font-bold"></input>
+            <input placeholder="Enter Amount" className="p-3 border-black rounded-lg font-bold "></input>
+            </div>
+            <button onClick={TransFerSolToOther} className="p-3 bg-blue-700 rounded-lg font-bold mybtn hover:cursor-pointer text-[25px]">Drop AirDrop</button>
+        </div>
+
         <ToastContainer />
         </>
     )

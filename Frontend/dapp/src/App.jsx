@@ -19,7 +19,7 @@ function App() {
 
   return (
     <>
-      <div className='h-[1000px] main-screen w-full flex justify-center'>
+      <div className='h-auto main-screen w-full flex justify-center'>
          <div className='w-[60rem] h-auto flex flex-col items-center space-y-4 p-5 z-50'>
             <h1 className='text-[50px] font-bold text-violet-700'>Welcome to Mack's Wallet Adapter</h1>
             <p className='text-[35px] text-pink-500 font-bold'>This wallet Adapter do not add <img className='inline h-[50px] w-[50px]' src={solana}></img> in real </p>
