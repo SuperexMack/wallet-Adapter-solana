@@ -24,7 +24,7 @@ function App() {
             <h1 className='text-[50px] font-bold text-white'>Mack's Wallet Adapter</h1>
             <p className='text-[30px] text-white font-extralight'>This wallet Adapter do not add <img className='inline h-[40px] w-[40px]' src={solana}></img> in real </p>
             <p className='text-[20px] font-extralight text-white'>Please Switch to devnet to see these <img className='inline h-[40px] w-[40px]' src={solana}></img></p>
-            <ConnectionProvider endpoint={"https://solana-devnet.g.alchemy.com/v2/1GcAeTdxUpNiEvq2IeIo_Cqm97P_J-R4"}>
+            <ConnectionProvider endpoint={"Add your rpc link here"}>
             <WalletProvider wallets={[]} autoConnect>
                 <WalletModalProvider>
                     <WalletMultiButton />
