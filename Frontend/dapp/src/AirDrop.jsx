@@ -1,6 +1,6 @@
 import { useConnection , useWallet } from "@solana/wallet-adapter-react"
 import { useEffect, useState , useCallback} from "react"
-import { SystemProgram, Transaction } from '@solana/web3.js';
+import { SystemProgram, Transaction ,PublicKey} from '@solana/web3.js';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,7 +10,8 @@ export function AirDrop(){
   
    const [getValue , setValue] = useState(0)
    const [balance,setBalance] = useState(0)
-   const [transferSol , setTransferSol] = useState(0)
+   const [transferSol , setTransferSol] = useState("")
+   const [amountTransfer , setAmountTransfer] = useState(0)
    let wallet = useWallet()
    let {connection} = useConnection()
 
@@ -32,6 +33,8 @@ export function AirDrop(){
     getTheBalanceData()
    },[connection,wallet.publicKey])
 
+   
+
    const sendDrop = async()=>{
     
     await connection.requestAirdrop(wallet.publicKey , parseInt(getValue))
@@ -39,17 +42,18 @@ export function AirDrop(){
     toast.success("Sol Added successfully")
    }
 
+   // Sending Money
 
    const TransFerSolToOther = useCallback(async()=>{
 
 
     try{
-        const lamports = await connection.getMinimumBalanceForRentExemption(0);
-
+        const lamports = parseInt(amountTransfer);
+        const recipientPublicKey = new PublicKey(transferSol);
         const transaction = new Transaction().add(
             SystemProgram.transfer({
                 fromPubkey: wallet.publicKey,
-                toPubkey: transferSol,
+                toPubkey: recipientPublicKey,
                 lamports,
             })
         );
@@ -60,14 +64,14 @@ export function AirDrop(){
         } = await connection.getLatestBlockhashAndContext();
     
     
-        
-    
         const signature = await wallet.sendTransaction(transaction, connection, { minContextSlot });
     
         await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
 
         toast.success("Sended Money to your Friend ")
-    
+        setAmountTransfer("")
+        setTransferSol("")
+        console.log("failed")
     
     }
 
@@ -77,7 +81,7 @@ export function AirDrop(){
     }
     
 
-   },[wallet.publicKey,connection,wallet.sendTransaction])
+   },[wallet.publicKey,connection,wallet.sendTransaction,amountTransfer,transferSol])
 
 
     return(
@@ -98,7 +102,7 @@ export function AirDrop(){
             <h1 className="text-center text-[60px] font-bold">Transfer Sol</h1>
             <div className="flex justify-center space-x-9">
             <input onChange={(e)=>setTransferSol(e.target.value)} placeholder="Enter public key" className="w-[500px] border-black rounded-lg p-3 font-bold"></input>
-            <input placeholder="Enter Amount" className="p-3 border-black rounded-lg font-bold "></input>
+            <input value={amountTransfer} onChange={(e)=>setAmountTransfer(e.target.value)} placeholder="Enter Amount" className="p-3 border-black rounded-lg font-bold "></input>
             </div>
             <button onClick={TransFerSolToOther} className="p-3 bg-blue-700 rounded-lg font-bold mybtn hover:cursor-pointer text-[25px]">Drop AirDrop</button>
         </div>
